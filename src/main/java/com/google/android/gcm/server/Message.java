@@ -38,6 +38,7 @@ import java.util.Map;
  *    .collapseKey(collapseKey)
  *    .timeToLive(3)
  *    .delayWhileIdle(true)
+ *    .dryRun(true)
  *    .build();
  * </pre></code>
  *
@@ -52,10 +53,11 @@ import java.util.Map;
  *    .build();
  * </pre></code>
  */
-public final class Message implements Serializable {
+public class Message implements Serializable {
 
   private final String collapseKey;
   private final Boolean delayWhileIdle;
+  private final Boolean dryRun;
   private final Integer timeToLive;
   private final Map<String, String> data;
 
@@ -66,6 +68,7 @@ public final class Message implements Serializable {
     // optional parameters
     private String collapseKey;
     private Boolean delayWhileIdle;
+    private Boolean dryRun;
     private Integer timeToLive;
 
     public Builder() {
@@ -83,15 +86,23 @@ public final class Message implements Serializable {
     /**
      * Sets the delayWhileIdle property (default value is {@literal false}).
      */
-    public Builder delayWhileIdle(boolean value) {
-      delayWhileIdle = value;
-      return this;
+    public Builder delayWhileIdle(Boolean value) {
+        delayWhileIdle = value;
+        return this;
+    }
+
+    /**
+     * Sets the dryRun property (default value is {@literal false}).
+     */
+    public Builder dryRun(Boolean value) {
+        dryRun = value;
+        return this;
     }
 
     /**
      * Sets the time to live, in seconds.
      */
-    public Builder timeToLive(int value) {
+    public Builder timeToLive(Integer value) {
       timeToLive = value;
       return this;
     }
@@ -119,6 +130,7 @@ public final class Message implements Serializable {
   private Message(Builder builder) {
     collapseKey = builder.collapseKey;
     delayWhileIdle = builder.delayWhileIdle;
+    dryRun = builder.dryRun;
     data = Collections.unmodifiableMap(builder.data);
     timeToLive = builder.timeToLive;
   }
@@ -136,6 +148,13 @@ public final class Message implements Serializable {
   public Boolean isDelayWhileIdle() {
     return delayWhileIdle;
   }
+
+  /**
+   * Gets the dryRun flag.
+   */
+  public Boolean isDryRun() {
+        return dryRun;
+    }
 
   /**
    * Gets the time to live (in seconds).
@@ -162,6 +181,9 @@ public final class Message implements Serializable {
     }
     if (delayWhileIdle != null) {
       builder.append("delayWhileIdle=").append(delayWhileIdle).append(", ");
+    }
+    if (dryRun != null) {
+        builder.append("dryRun=").append(dryRun).append(", ");
     }
     if (!data.isEmpty()) {
       builder.append("data: {");

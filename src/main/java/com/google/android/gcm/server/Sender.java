@@ -15,25 +15,6 @@
  */
 package com.google.android.gcm.server;
 
-import static com.google.android.gcm.server.Constants.GCM_SEND_ENDPOINT;
-import static com.google.android.gcm.server.Constants.JSON_CANONICAL_IDS;
-import static com.google.android.gcm.server.Constants.JSON_ERROR;
-import static com.google.android.gcm.server.Constants.JSON_FAILURE;
-import static com.google.android.gcm.server.Constants.JSON_MESSAGE_ID;
-import static com.google.android.gcm.server.Constants.JSON_MULTICAST_ID;
-import static com.google.android.gcm.server.Constants.JSON_PAYLOAD;
-import static com.google.android.gcm.server.Constants.JSON_REGISTRATION_IDS;
-import static com.google.android.gcm.server.Constants.JSON_RESULTS;
-import static com.google.android.gcm.server.Constants.JSON_SUCCESS;
-import static com.google.android.gcm.server.Constants.PARAM_COLLAPSE_KEY;
-import static com.google.android.gcm.server.Constants.PARAM_DELAY_WHILE_IDLE;
-import static com.google.android.gcm.server.Constants.PARAM_PAYLOAD_PREFIX;
-import static com.google.android.gcm.server.Constants.PARAM_REGISTRATION_ID;
-import static com.google.android.gcm.server.Constants.PARAM_TIME_TO_LIVE;
-import static com.google.android.gcm.server.Constants.TOKEN_CANONICAL_REG_ID;
-import static com.google.android.gcm.server.Constants.TOKEN_ERROR;
-import static com.google.android.gcm.server.Constants.TOKEN_MESSAGE_ID;
-
 import com.google.android.gcm.server.Result.Builder;
 
 import org.json.simple.JSONObject;
@@ -57,6 +38,8 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.google.android.gcm.server.Constants.*;
 
 /**
  * Helper class to send messages to the GCM service using an API Key.
@@ -151,6 +134,10 @@ public class Sender {
     Boolean delayWhileIdle = message.isDelayWhileIdle();
     if (delayWhileIdle != null) {
       addParameter(body, PARAM_DELAY_WHILE_IDLE, delayWhileIdle ? "1" : "0");
+    }
+    Boolean dryRun = message.isDryRun();
+    if (dryRun != null) {
+      addParameter(body, PARAM_DRY_RUN, dryRun ? "1" : "0");
     }
     String collapseKey = message.getCollapseKey();
     if (collapseKey != null) {
@@ -350,6 +337,8 @@ public class Sender {
     setJsonField(jsonRequest, PARAM_COLLAPSE_KEY, message.getCollapseKey());
     setJsonField(jsonRequest, PARAM_DELAY_WHILE_IDLE,
         message.isDelayWhileIdle());
+    setJsonField(jsonRequest, PARAM_DRY_RUN,
+        message.isDryRun());
     jsonRequest.put(JSON_REGISTRATION_IDS, registrationIds);
     Map<String, String> payload = message.getData();
     if (!payload.isEmpty()) {

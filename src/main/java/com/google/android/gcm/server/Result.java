@@ -43,13 +43,13 @@ import java.io.Serializable;
  *         - otherwise, update the server datastore with the new id.
  * </pre>
  */
-public final class Result implements Serializable {
+public class Result implements Serializable {
 
   private final String messageId;
   private final String canonicalRegistrationId;
   private final String errorCode;
 
-  static final class Builder {
+    public static final class Builder {
 
     // optional parameters
     private String messageId;

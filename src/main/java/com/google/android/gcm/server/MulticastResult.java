@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Result of a GCM multicast message request .
  */
-public final class MulticastResult implements Serializable {
+public class MulticastResult implements Serializable {
 
   private final int success;
   private final int failure;
@@ -32,7 +32,7 @@ public final class MulticastResult implements Serializable {
   private final List<Result> results;
   private final List<Long> retryMulticastIds;
 
-  static final class Builder {
+  public static final class Builder {
 
     private final List<Result> results = new ArrayList<Result>();
 

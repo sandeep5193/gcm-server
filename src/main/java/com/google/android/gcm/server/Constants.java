@@ -52,6 +52,11 @@ public final class Constants {
   public static final String PARAM_TIME_TO_LIVE = "time_to_live";
 
   /**
+   * HTTP parameter to send a request without actually sending a message.
+   */
+  public static final String PARAM_DRY_RUN = "dry_run";
+
+  /**
    * Too many messages sent by the sender. Retry after a while.
    */
   public static final String ERROR_QUOTA_EXCEEDED = "QuotaExceeded";
