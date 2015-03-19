@@ -65,15 +65,10 @@
 
     <distributionManagement>
         <repository>
-            <id>movile.releases</id>
-            <name>Movile Nexus Releases</name>
-            <url>http://nexus.it.movile.com:8081/nexus/content/repositories/releases</url>
+            <id>central</id>
+            <name>bintray</name>
+	    <url>http://jcenter.bintray.com</url>
         </repository>
-        <snapshotRepository>
-            <id>movile.snapshots</id>
-            <name>Movile Nexus Snapshots</name>
-            <url>http://nexus.it.movile.com:8081/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
     </distributionManagement>
 
     <scm>
