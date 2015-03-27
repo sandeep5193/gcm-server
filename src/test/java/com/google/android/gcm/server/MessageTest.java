@@ -56,7 +56,7 @@ public class MessageTest {
     assertEquals("108", message.getCollapseKey());
     assertTrue(message.isDelayWhileIdle());
     assertEquals(42, message.getTimeToLive().intValue());
-    Map<String, String> data = message.getData();
+    Map<String, Object> data = message.getData();
     assertEquals(2, data.size());
     assertEquals("v1", data.get("k1"));
     assertEquals("v2", data.get("k2"));
@@ -64,13 +64,7 @@ public class MessageTest {
     assertTrue(toString.contains("collapseKey=108"));
     assertTrue(toString.contains("timeToLive=42"));
     assertTrue(toString.contains("delayWhileIdle=true"));
-    assertTrue(toString.contains("k1=v1"));
-    assertTrue(toString.contains("k2=v2"));
-  }
-
-  @Test(expected = UnsupportedOperationException.class)
-  public void testPayloadDataIsImmutable() {
-    Message message = new Message.Builder().build();
-    message.getData().clear();
+    assertTrue(toString.contains("\"k1\":\"v1\""));
+    assertTrue(toString.contains("\"k2\":\"v2\""));
   }
 }

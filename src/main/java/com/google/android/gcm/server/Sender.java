@@ -30,12 +30,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -130,82 +126,18 @@ public class Sender {
    */
   public Result sendNoRetry(Message message, String registrationId)
       throws IOException {
-    StringBuilder body = newBody(PARAM_REGISTRATION_ID, registrationId);
-    Boolean delayWhileIdle = message.isDelayWhileIdle();
-    if (delayWhileIdle != null) {
-      addParameter(body, PARAM_DELAY_WHILE_IDLE, delayWhileIdle ? "1" : "0");
-    }
-    Boolean dryRun = message.isDryRun();
-    if (dryRun != null) {
-      addParameter(body, PARAM_DRY_RUN, dryRun ? "1" : "0");
-    }
-    String collapseKey = message.getCollapseKey();
-    if (collapseKey != null) {
-      addParameter(body, PARAM_COLLAPSE_KEY, collapseKey);
-    }
-    Integer timeToLive = message.getTimeToLive();
-    if (timeToLive != null) {
-      addParameter(body, PARAM_TIME_TO_LIVE, Integer.toString(timeToLive));
-    }
-    for (Entry<String, String> entry : message.getData().entrySet()) {
-      String key = PARAM_PAYLOAD_PREFIX + entry.getKey();
-      String value = entry.getValue();
-      addParameter(body, key, URLEncoder.encode(value, UTF8));
-    }
-    String requestBody = body.toString();
-    logger.finest("Request body: " + requestBody);
-    HttpURLConnection conn = post(GCM_SEND_ENDPOINT, requestBody);
-    int status = conn.getResponseCode();
-    if (status == 503) {
-      logger.fine("GCM service is unavailable");
-      return null;
-    }
-    if (status != 200) {
-      throw new InvalidRequestException(status);
-    }
-    try {
-      BufferedReader reader =
-          new BufferedReader(new InputStreamReader(conn.getInputStream()));
-      try {
-        String line = reader.readLine();
 
-        if (line == null || line.equals("")) {
-          throw new IOException("Received empty response from GCM service.");
-        }
-        String[] responseParts = split(line);
-        String token = responseParts[0];
-        String value = responseParts[1];
-        if (token.equals(TOKEN_MESSAGE_ID)) {
-          Builder builder = new Result.Builder().messageId(value);
-          // check for canonical registration id
-          line = reader.readLine();
-          if (line != null) {
-            responseParts = split(line);
-            token = responseParts[0];
-            value = responseParts[1];
-            if (token.equals(TOKEN_CANONICAL_REG_ID)) {
-              builder.canonicalRegistrationId(value);
-            } else {
-              logger.warning("Received invalid second line from GCM: " + line);
-            }
-          }
-
-          Result result = builder.build();
-          if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Message created succesfully (" + result + ")");
-          }
-          return result;
-        } else if (token.equals(TOKEN_ERROR)) {
-          return new Result.Builder().errorCode(value).build();
-        } else {
-          throw new IOException("Received invalid response from GCM: " + line);
-        }
-      } finally {
-        reader.close();
+      if (registrationId == null) {
+          throw new IllegalArgumentException("registrationId must not be null");
       }
-    } finally {
-      conn.disconnect();
-    }
+
+      MulticastResult multicastResult = sendNoRetry(message, Arrays.asList(registrationId));
+
+      if (multicastResult.getTotal() > 0) {
+          return multicastResult.getResults().get(0);
+      } else {
+          return null;
+      }
   }
 
   /**
@@ -340,7 +272,7 @@ public class Sender {
     setJsonField(jsonRequest, PARAM_DRY_RUN,
         message.isDryRun());
     jsonRequest.put(JSON_REGISTRATION_IDS, registrationIds);
-    Map<String, String> payload = message.getData();
+    JSONObject payload = message.getData();
     if (!payload.isEmpty()) {
       jsonRequest.put(JSON_PAYLOAD, payload);
     }
@@ -500,7 +432,7 @@ public class Sender {
    * @param value parameter's value
    */
   protected static void addParameter(StringBuilder body, String name,
-      String value) {
+                                     Object value) {
     nonNull(body).append('&')
         .append(nonNull(name)).append('=').append(nonNull(value));
   }

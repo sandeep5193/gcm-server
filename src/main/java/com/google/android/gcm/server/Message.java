@@ -15,6 +15,8 @@
  */
 package com.google.android.gcm.server;
 
+import org.json.simple.JSONObject;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -59,11 +61,11 @@ public class Message implements Serializable {
   private final Boolean delayWhileIdle;
   private final Boolean dryRun;
   private final Integer timeToLive;
-  private final Map<String, String> data;
+  private final JSONObject data;
 
   public static final class Builder {
 
-    private final Map<String, String> data;
+    private JSONObject data;
 
     // optional parameters
     private String collapseKey;
@@ -72,7 +74,7 @@ public class Message implements Serializable {
     private Integer timeToLive;
 
     public Builder() {
-      this.data = new LinkedHashMap<String, String>();
+      this.data = new JSONObject();
     }
 
     /**
@@ -115,7 +117,7 @@ public class Message implements Serializable {
       return this;
     }
 
-    public Builder setData(Map<String,String> data) {
+    public Builder setData(JSONObject data) {
       this.data.clear();
       this.data.putAll(data);
       return this;
@@ -131,7 +133,7 @@ public class Message implements Serializable {
     collapseKey = builder.collapseKey;
     delayWhileIdle = builder.delayWhileIdle;
     dryRun = builder.dryRun;
-    data = Collections.unmodifiableMap(builder.data);
+    data = builder.data;
     timeToLive = builder.timeToLive;
   }
 
@@ -166,7 +168,7 @@ public class Message implements Serializable {
   /**
    * Gets the payload data, which is immutable.
    */
-  public Map<String, String> getData() {
+  public JSONObject getData() {
     return data;
   }
 
@@ -186,13 +188,7 @@ public class Message implements Serializable {
         builder.append("dryRun=").append(dryRun).append(", ");
     }
     if (!data.isEmpty()) {
-      builder.append("data: {");
-      for (Map.Entry<String, String> entry : data.entrySet()) {
-        builder.append(entry.getKey()).append("=").append(entry.getValue())
-            .append(",");
-      }
-      builder.delete(builder.length() - 1, builder.length());
-      builder.append("}");
+      builder.append(data.toJSONString());
     }
     if (builder.charAt(builder.length() - 1) == ' ') {
       builder.delete(builder.length() - 2, builder.length());

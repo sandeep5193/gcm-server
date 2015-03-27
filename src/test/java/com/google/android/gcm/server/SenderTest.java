@@ -63,7 +63,7 @@ public class SenderTest {
   private final int ttl = 108;
   private final String authKey = "4815162342";
   private final JSONParser jsonParser = new JSONParser();
-  
+
   private final Message message =
       new Message.Builder()
           .collapseKey(collapseKey)
@@ -161,30 +161,6 @@ public class SenderTest {
   }
 
   @Test
-  public void testSendNoRetry_ok() throws Exception {
-    setResponseExpectations(200, "id=4815162342");
-    Result result = sender.sendNoRetry(message, regId);
-    assertNotNull(result);
-    assertEquals("4815162342", result.getMessageId());
-    assertNull(result.getCanonicalRegistrationId());
-    assertNull(result.getErrorCodeName());
-    assertRequestBody();
-    verify(mockedConn).disconnect();
-  }
-
-  @Test
-  public void testSendNoRetry_ok_canonical() throws Exception {
-    setResponseExpectations(200, "id=4815162342\nregistration_id=108");
-    Result result = sender.sendNoRetry(message, regId);
-    assertNotNull(result);
-    assertEquals("4815162342", result.getMessageId());
-    assertEquals("108", result.getCanonicalRegistrationId());
-    assertNull(result.getErrorCodeName());
-    assertRequestBody();
-    verify(mockedConn).disconnect();
-  }
-
-  @Test
   public void testSendNoRetry_unauthorized() throws Exception {
     setResponseExpectations(401, "");
     try {
@@ -193,26 +169,20 @@ public class SenderTest {
     } catch (InvalidRequestException e) {
       assertEquals(401, e.getHttpStatusCode());
     }
-    assertRequestBody();
-  }
-
-  @Test
-  public void testSendNoRetry_error() throws Exception {
-    setResponseExpectations(200, "Error=D'OH!");
-    Result result = sender.sendNoRetry(message, regId);
-    assertNull(result.getMessageId());
-    assertNull(result.getCanonicalRegistrationId());
-    assertEquals("D'OH!", result.getErrorCodeName());
-    assertRequestBody();
-    verify(mockedConn).disconnect();
+      assertRequestJsonBody(regId);
   }
 
   @Test
   public void testSendNoRetry_serviceUnavailable() throws Exception {
-    setResponseExpectations(503, "");
-    Result result = sender.sendNoRetry(message, regId);
-    assertNull(result);
-    assertRequestBody();
+    setResponseExpectations(503, "service unavailable");
+
+      try {
+          sender.sendNoRetry(message, regId);
+      } catch (InvalidRequestException e) {
+          assertEquals(503, e.getHttpStatusCode());
+          assertEquals("service unavailable", e.getDescription());
+          assertRequestJsonBody(regId);
+      }
   }
 
   @Test(expected = IOException.class)
