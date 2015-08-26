@@ -271,6 +271,9 @@ public class Sender {
         message.isDelayWhileIdle());
     setJsonField(jsonRequest, PARAM_DRY_RUN,
         message.isDryRun());
+    if(message.isHighPriority() != null) {
+      setJsonField(jsonRequest, PARAM_PRIORITY, message.isHighPriority() ? PRIORITY_HIGH : PRIORITY_NORMAL);
+    }
     jsonRequest.put(JSON_REGISTRATION_IDS, registrationIds);
     JSONObject payload = message.getData();
     if (!payload.isEmpty()) {
