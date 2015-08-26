@@ -41,6 +41,7 @@ import java.util.Map;
  *    .timeToLive(3)
  *    .delayWhileIdle(true)
  *    .dryRun(true)
+ *    .highPriority(true);
  *    .build();
  * </pre></code>
  *
@@ -60,6 +61,7 @@ public class Message implements Serializable {
   private final String collapseKey;
   private final Boolean delayWhileIdle;
   private final Boolean dryRun;
+  private final Boolean highPriority;
   private final Integer timeToLive;
   private final JSONObject data;
 
@@ -71,6 +73,7 @@ public class Message implements Serializable {
     private String collapseKey;
     private Boolean delayWhileIdle;
     private Boolean dryRun;
+    private Boolean highPriority;
     private Integer timeToLive;
 
     public Builder() {
@@ -99,6 +102,14 @@ public class Message implements Serializable {
     public Builder dryRun(Boolean value) {
         dryRun = value;
         return this;
+    }
+
+    /**
+     * Sets the highPriority property (default value is {@literal false}).
+     */
+    public Builder highPriority(Boolean value) {
+      highPriority = value;
+      return this;
     }
 
     /**
@@ -133,6 +144,7 @@ public class Message implements Serializable {
     collapseKey = builder.collapseKey;
     delayWhileIdle = builder.delayWhileIdle;
     dryRun = builder.dryRun;
+    highPriority = builder.highPriority;
     data = builder.data;
     timeToLive = builder.timeToLive;
   }
@@ -157,6 +169,13 @@ public class Message implements Serializable {
   public Boolean isDryRun() {
         return dryRun;
     }
+
+  /**
+   * Gets the highPriority flag.
+   */
+  public Boolean isHighPriority() {
+    return highPriority;
+  }
 
   /**
    * Gets the time to live (in seconds).
@@ -186,6 +205,9 @@ public class Message implements Serializable {
     }
     if (dryRun != null) {
         builder.append("dryRun=").append(dryRun).append(", ");
+    }
+    if (highPriority != null) {
+      builder.append("highPriority=").append(highPriority).append(", ");
     }
     if (!data.isEmpty()) {
       builder.append(data.toJSONString());

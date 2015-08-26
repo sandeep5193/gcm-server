@@ -57,6 +57,21 @@ public final class Constants {
   public static final String PARAM_DRY_RUN = "dry_run";
 
   /**
+   * HTTP parameter to send a message with priority set.
+   */
+  public static final String PARAM_PRIORITY = "priority";
+
+  /**
+   * Priority parameter value for sending a high priority message.
+   */
+  public static final String PRIORITY_HIGH = "high";
+
+  /**
+   * Priority parameter value for sending a normal priority message.
+   */
+  public static final String PRIORITY_NORMAL = "normal";
+
+  /**
    * Too many messages sent by the sender. Retry after a while.
    */
   public static final String ERROR_QUOTA_EXCEEDED = "QuotaExceeded";
